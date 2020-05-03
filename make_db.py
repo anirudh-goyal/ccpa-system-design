@@ -9,17 +9,18 @@ import pprint
 import redis
 import json
 
-r = redis.Redis()
+redis_pre_ccpa = redis.Redis()
+redis_post_ccpa = redis.Redis(db=1)
 pp = pprint.PrettyPrinter(indent=4)
 
-essential = set(["name", "mail", "password"]) # must be included in every record
+essential = set(["name", "email", "password"]) # must be included in every record
 
 profile = generate_fake_profile()
 pre_ccpa_object = dict()
 post_ccpa_object = dict()
 
 for key in profile:
-    include = 1 #if (random.randint(0,1) == 1 or key in essential) else 0
+    include = 1 if (random.randint(0,1) == 1 or key in essential) else 0
     if(include):
         pre_ccpa_object[key] = profile[key]
         post_ccpa_object[key] = {
@@ -27,11 +28,11 @@ for key in profile:
             "sensitivity": sensitivity[key], 
             "return_to_user": return_to_user[key]
         }
-pp.pprint(pre_ccpa_object)
-pp.pprint(post_ccpa_object)
+# pp.pprint(pre_ccpa_object)
+# pp.pprint(post_ccpa_object)
 print(post_ccpa_object["name"]["data"])
-r.set(post_ccpa_object["name"]["data"], json.dumps(post_ccpa_object))
-r.set(pre_ccpa_object["name"]+" pre_ccpa", json.dumps(pre_ccpa_object))
+redis_post_ccpa.set(post_ccpa_object["name"]["data"], json.dumps(post_ccpa_object))
+redis_pre_ccpa.set(pre_ccpa_object["name"], json.dumps(pre_ccpa_object))
 # x = r.get("mykey").decode("utf-8")
 
 

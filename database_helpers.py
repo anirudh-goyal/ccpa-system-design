@@ -27,6 +27,8 @@ def generate_fake_profile():
     fake = Faker()
     profile = fake.profile()
     profile["birthdate"] = str(profile["birthdate"])
+    profile["email"] = profile["mail"]
+    profile.pop("mail")
     profile.pop("current_location")
     profile.pop("address")
     profile["ssn"] = fake.ssn()
@@ -46,24 +48,24 @@ high = "high"
 fake = Faker()
 
 sensitivity = {
-    "job": low,
-    "company": low,
-    "ssn": high, 
-    "residence": medium,
-    "blood_group": high, 
-    "website": low,
-    "username": low, 
-    "name": low, 
-    "sex": low, 
-    "mail": low, 
-    "birthdate": medium,
-    "driving_license": high, 
-    "credit_card": high, 
-    "purchasing_history": medium, 
-    "outgoing_call_history": medium,
-    "password": medium,
-    "security_question1": high, 
-    "security_question2": high,
+    "job": 1,
+    "company": 1,
+    "ssn": 3, 
+    "residence": 2,
+    "blood_group": 3, 
+    "website": 1,
+    "username": 1, 
+    "name": 1, 
+    "sex": 1, 
+    "email": 1, 
+    "birthdate": 2,
+    "driving_license": 3, 
+    "credit_card": 3, 
+    "purchasing_history": 2, 
+    "outgoing_call_history": 2,
+    "password": 2,
+    "security_question1": 3, 
+    "security_question2": 3,
 }
 
 return_to_user = {
@@ -76,7 +78,7 @@ return_to_user = {
     "username": 1, 
     "name": 1, 
     "sex": 1, 
-    "mail": 1, 
+    "email": 1, 
     "birthdate": 1,
     "driving_license": 0, 
     "credit_card": 1, 

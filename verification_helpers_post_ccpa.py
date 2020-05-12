@@ -1,5 +1,6 @@
 import redis
 import json
+from datetime import datetime
 
 redis_post_ccpa = redis.Redis(db=1)
 
@@ -33,7 +34,22 @@ def get_verification_prompts(user):
         items = sorted(user_data.items(), key = lambda x: x[1]["sensitivity"])
         max_sensitivity = items[-1][1]["sensitivity"]
         verification_prompts = [x[0] for x in items[(-1)*max_sensitivity:]]
-        return verification_prompts
+        return {"prompts": verification_prompts, "level":verification_level}
 
-u = {"name": "Debra Parker", "email": "kevinreed@gmail.com","password":"io7dzjVe(R"}
-print(get_verification_prompts(u))
+def log_verification(user_data, verification_prompts):
+    verification_id = int(redis_post_ccpa.get("verification_log_id"))
+    redis_post_ccpa.incr("verification_log_id")
+    logging_object = {
+        "name": user_data["name"],
+        "email": user_data["email"],
+        "date_received": str(datetime.now()),
+        "user_found": 1 if verification_prompts != None else 0, 
+        "verification_level": verification_prompts["level"],
+        "verification_prompts": verification_prompts["prompts"],
+        "verified": 0,
+    }
+    redis_post_ccpa.set(verification_id, json.dumps(logging_object))
+    return verification_id
+
+# u = {"name": "Debra Parker", "email": "kevinreed@gmail.com","password":"io7dzjVe(R"}
+# print(get_verification_prompts(u))

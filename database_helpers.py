@@ -4,6 +4,8 @@
 
 from faker import Faker
 import random
+import pprint
+
 
 purchasing_history = [
     {
@@ -23,23 +25,57 @@ purchasing_history = [
     },
 ]
 
+diseases = ["Anemia", "Appendicitis", "Arthritis", "Asthma", "Bacteria"]
+
+def remove_keys(dictionary, keys):
+    for k in keys:
+        dictionary.pop(k)
+
+pp = pprint.PrettyPrinter(indent=4)
+
 def generate_fake_profile():
     fake = Faker()
     profile = fake.profile()
-    profile["birthdate"] = str(profile["birthdate"])
-    profile["email"] = profile["mail"]
-    profile.pop("mail")
-    profile.pop("current_location")
-    profile.pop("address")
-    profile["ssn"] = fake.ssn()
-    profile["credit_card"] = fake.credit_card_full()
-    profile["outgoing_call_history"] = [fake.phone_number() for i in range(5)]
     random.shuffle(purchasing_history)
-    profile["purchasing_history"] = purchasing_history
-    profile["password"] = fake.password()
-    profile["security_question1"] = fake.name()
-    profile["security_question2"] = fake.location_on_land()[2]
-    return profile
+    new_profile = {}
+    new_profile["personal_info"] = {
+        "name": profile["name"].replace(":",""),
+        "birthdate": str(profile["birthdate"]),
+        "email": profile["mail"],
+        "phone": fake.phone_number(),
+        "residence": profile["residence"],
+        "sex": profile["sex"]
+    }
+    new_profile["account_info"] = {
+        "username": profile["username"],
+        "password": fake.password()
+    }
+    new_profile["security_questions"] = {
+        "security_question1": fake.name(), 
+        "security_question2": fake.location_on_land()[2],
+    }
+    new_profile["account_history"] = {
+        "purchasing_history": purchasing_history,
+        "outgoing_call_history": [fake.phone_number() for i in range(5)]
+    }
+    new_profile["health_info"] = {
+        "past_diseases": random.sample(diseases, 3),
+        "blood_group": profile["blood_group"]
+    }
+    new_profile["financial_info"] = {
+        "credit_card": fake.credit_card_full(),
+        "bank_account": random.randint(5425425431, 5425425431 + 500000)
+    }
+    new_profile["government_ids"] = {
+        "ssn": fake.ssn(),
+        "driving_license": "DL" + fake.ssn()
+    }
+    new_profile["employment"] = {
+        "employer": profile["company"],
+        "job_title": profile["job"],
+        "website": profile["website"][0]
+    }
+    return new_profile
 
 low = "low"
 medium = "medium"
@@ -48,43 +84,25 @@ high = "high"
 fake = Faker()
 
 sensitivity = {
-    "job": 1,
-    "company": 1,
-    "ssn": 3, 
-    "residence": 2,
-    "blood_group": 3, 
-    "website": 1,
-    "username": 1, 
-    "name": 1, 
-    "sex": 1, 
-    "email": 1, 
-    "birthdate": 2,
-    "driving_license": 3, 
-    "credit_card": 3, 
-    "purchasing_history": 2, 
-    "outgoing_call_history": 2,
-    "password": 2,
-    "security_question1": 3, 
-    "security_question2": 3,
+    "personal_info": 1,
+    "account_info": 2,
+    "security_questions": 2,
+    "account_history": 2, 
+    "health_info": 3,
+    "financial_info": 3,
+    "government_ids": 3, 
+    "employment": 1,
 }
 
 return_to_user = {
-    "job": 1,
-    "company": 1,
-    "ssn": 0, 
-    "residence": 1,
-    "blood_group": 0, 
-    "website": 1,
-    "username": 1, 
-    "name": 1, 
-    "sex": 1, 
-    "email": 1, 
-    "birthdate": 1,
-    "driving_license": 0, 
-    "credit_card": 1, 
-    "purchasing_history": 1, 
-    "outgoing_call_history": 1,
-    "password": 0,
-    "security_question1": 0, 
-    "security_question2": 0,
+    "personal_info": 1,
+    "account_info": 1,
+    "security_questions": 0,
+    "account_history": 1, 
+    "health_info": 0,
+    "financial_info": 1,
+    "government_ids": 0, 
+    "employment": 1,
 }
+
+# pp.pprint(generate_fake_profile())

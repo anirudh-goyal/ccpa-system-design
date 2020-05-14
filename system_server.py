@@ -14,16 +14,15 @@ app = Flask(__name__)
 @app.route('/ccpa_request', methods=['POST'])
 def ccpa_request():
     request_data = json.loads(request.data)
-    verification_prompts = get_verification_prompts(request_data)
-    verification_log_id = log_verification(request_data, verification_prompts)
+    log_object = get_verification_prompts(request_data)
     response = {
         "name": request_data["name"],
-        "request_id": verification_log_id,
-        "user_found": 1 if verification_prompts != None else 0,
+        "verification_id": log_object["verification_id"],
+        "user_found": log_object["user_found"],
         "login_authorized": 1,
-        "verification_prompts": verification_prompts["prompts"],
+        "verification_prompts": log_object["verification_prompts"],
     }
-    print(response)
+    # print(response)
     return jsonify(response)
 
 @app.route('/send_identification', methods=['POST'])
